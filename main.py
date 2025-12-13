@@ -918,17 +918,3 @@ async def check_db():
         print(f"   📊 Knowledge collection: {knowledge_count} entries")
     except Exception as e:
         print(f"❌ Startup error: {e}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
