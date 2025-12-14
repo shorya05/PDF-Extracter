@@ -28,8 +28,8 @@ if not PERPLEXITY_API_KEY:
 
 # ===================== CONFIGURATION =====================
 MONGO_URI = "mongodb+srv://aeranshorya_db_user:MnhnGxS22K8CzeGa@cluster0.figsico.mongodb.net/?appName=Cluster0"
-DATABASE_NAME = "clientdb"
-COLLECTION_NAME = "client"
+DATABASE_NAME = "Coderower"
+COLLECTION_NAME = "data"
 EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
 OUTPUT_FOLDER = "filled_pdfs"
 SIMILARITY_THRESHOLD = 0.70
@@ -148,7 +148,7 @@ def find_answer(field_name: str, field_type: Optional[str] = None) -> Optional[s
         pipeline = [
             {
                 "$vectorSearch": {
-                    "index": "vector_index",
+                    "index": "default",
                     "path": "embedding",
                     "queryVector": embed,
                     "numCandidates": 40,
@@ -414,124 +414,6 @@ def count_all_fields(obj):
 
 import requests
 
-
-# import json
-# from docx import Document
-
-# # ---------------------- PERPLEXITY HELPERS ----------------------
-
-# def perplexity_call(prompt, expect_list=True):
-#     """Generalized call handler for Perplexity Sonar."""
-
-#     url = "https://api.perplexity.ai/chat/completions"
-
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Authorization": f"Bearer {PERPLEXITY_API_KEY}"
-#     }
-
-#     payload = {
-#         "model": "sonar-pro",
-#         "messages": [{"role": "user", "content": prompt}],
-#         "temperature": 0
-#     }
-
-#     response = requests.post(url, headers=headers, json=payload)
-#     if response.status_code != 200:
-#         raise Exception(response.text)
-
-#     content = response.json()["choices"][0]["message"]["content"]
-
-#     # Cleanup Markdown
-#     content = content.replace("```json", "").replace("```", "").strip()
-
-#     # Extract JSON array
-#     if expect_list:
-#         start = content.find("[")
-#         end = content.rfind("]")
-#     else:
-#         start = content.find("{")
-#         end = content.rfind("}")
-
-#     if start == -1 or end == -1:
-#         raise Exception("Perplexity returned non-JSON output: " + content)
-
-#     json_text = content[start:end+1]
-
-#     try:
-#         return json.loads(json_text)
-#     except Exception as e:
-#         raise Exception(f"JSON parse error: {e}\nRaw Output:\n{content}")
-
-# def pdf_has_real_fields(pdf_path):
-#     """
-#     Detect if a PDF contains AcroForm fields (dynamic form PDFs).
-#     Returns True if PDF has fillable fields.
-#     """
-#     try:
-#         import fitz  # PyMuPDF
-#         doc = fitz.open(pdf_path)
-
-#         # Check for AcroForm
-#         if doc.has_annots():
-#             for page in doc:
-#                 widgets = page.widgets()
-#                 if widgets:
-#                     return True
-
-#         # Check xref objects for form fields
-#         for i in range(1, doc.xref_length()):
-#             obj = doc.xref_object(i)
-#             if "/AcroForm" in obj or "/FT" in obj:
-#                 return True
-
-#         return False
-
-#     except Exception:
-#         return False
-
-# def perplexity_extract_docx(raw_text):
-#     prompt = f"""
-# Extract ALL question–answer pairs from this DOCX text.
-
-# Rules:
-# - A "question" = any label requesting user input.
-# - An "answer" = the filled-in value or nearest value after the label.
-# - Preserve wording exactly.
-# - Return ONLY valid JSON like:
-
-# [
-#   {{ "question": "...", "answer": "..." }}
-# ]
-
-# DOCX CONTENT:
-# --------------------------------
-# {raw_text}
-# --------------------------------
-# """
-#     return perplexity_call(prompt)
-
-
-# def perplexity_extract_pdf(raw_text):
-#     prompt = f"""
-# Extract ALL question–answer pairs from this PDF text.
-
-# Return ONLY JSON:
-
-# [
-#   {{ "question": "...", "answer": "..." }}
-# ]
-
-# PDF TEXT:
-# --------------------------------
-# {raw_text}
-# --------------------------------
-# """
-#     return perplexity_call(prompt)
-
-# import json
-# import requests
-
 def gpt_extract(raw_text):
 
     prompt = f"""
@@ -664,7 +546,7 @@ def pdf_has_real_fields(pdf_path):
     doc.close()
     return False
 
-@app.post("/api/extract-data-from-static-pdf/")
+@app.post("/api/extract-data/")
 async def extract_dynamic(file: UploadFile = File(...)):
 
     if not file.filename.lower().endswith(".pdf"):
